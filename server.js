@@ -45,26 +45,50 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-const upload = multer({ storage, fileFilter, limits: { fileSize: 2 * 1024 * 1024 } }); // Лимит: 2MB
+const upload = multer({ storage, fileFilter, limits: { fileSize: 100 * 1024 * 1024 } }); // Лимит: 10MB
+const DraftSettings = require("./models/draftSettings");
+const LiveSettings = require("./models/liveSettings");
+
+// ✅ Функция удаления старого файла
+const deleteOldFile = (fileUrl) => {
+    if (!fileUrl || !fileUrl.includes("/uploads/")) return;
+    const filePath = path.join(__dirname, fileUrl.split("/uploads/")[1]);
+
+    if (fs.existsSync(filePath)) {
+        fs.unlink(filePath, (err) => {
+            if (err) console.error("Ошибка удаления старого файла:", err);
+            else console.log("🗑 Старый файл удален:", filePath);
+        });
+    }
+};
 
 // ✅ Обработчик загрузки файлов
 app.post("/upload", upload.single("file"), async (req, res) => {
-    if (!req.file) return res.status(400).json({ message: "Файл не загружен" });
+    if (!req.file || !req.body.type) return res.status(400).json({ message: "Файл или тип не указан" });
 
-    const fileUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
-    console.log("✅ Файл загружен:", fileUrl);
+    try {
+        const { type } = req.body; // logo или bgImage
+        const settings = await DraftSettings.findOne();
+        const oldFileUrl = settings?.[type];
 
-    res.json({ url: fileUrl });
+        deleteOldFile(oldFileUrl);
+
+        const fileUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+        console.log(`✅ ${type} загружен:`, fileUrl);
+
+        await DraftSettings.updateOne({}, { [type]: fileUrl }, { upsert: true });
+
+        res.json({ url: fileUrl });
+    } catch (error) {
+        console.error("Ошибка загрузки файла:", error);
+        res.status(500).json({ message: "Ошибка загрузки файла", error });
+    }
 });
 
-// ✅ Подключение маршрутов для конструктора и конечного сайта
-const draftRoutes = require("./routes/draftRoutes"); // Черновик (admin-panel)
-const liveRoutes = require("./routes/liveRoutes"); // Публичный сайт (storefront)
-const publishRoutes = require("./routes/publishRoutes"); // Публикация
 
-app.use("/api/draft", draftRoutes);
-app.use("/api/live", liveRoutes);
-app.use("/api/publish", publishRoutes);
+// ✅ Подключение маршрутов (Используем один `settingsRoutes.js` вместо 3 файлов)
+const settingsRoutes = require("./routes/settingsRoutes");
+app.use("/api", settingsRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Сервер запущен на порту ${PORT}`));
