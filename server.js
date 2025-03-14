@@ -90,5 +90,10 @@ app.post("/upload", upload.single("file"), async (req, res) => {
 const settingsRoutes = require("./routes/settingsRoutes");
 app.use("/api", settingsRoutes);
 
+// ✅ Подключение маршрутов для товаров
+const productRoutes = require("./routes/productRoutes");
+app.use("/api/products", productRoutes);
+
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Сервер запущен на порту ${PORT}`));
