@@ -26,12 +26,24 @@ exports.addDraftProduct = async (req, res) => {
 exports.updateDraftProduct = async (req, res) => {
     try {
         const { id } = req.params;
-        const updatedProduct = await DraftProduct.findByIdAndUpdate(id, req.body, { new: true });
+        const updatedProduct = await DraftProduct.findByIdAndUpdate(
+            id, 
+            req.body, 
+            { new: true, runValidators: true } // ✅ Добавляем `runValidators`
+        );
+        
+        if (!updatedProduct) {
+            return res.status(404).json({ message: "Товар не найден" });
+        }
+
         res.json(updatedProduct);
     } catch (error) {
+        console.error("Ошибка обновления товара:", error);
         res.status(500).json({ message: "Ошибка обновления товара", error });
     }
 };
+
+
 
 // 📌 Удалить товар (DRAFT)
 exports.deleteDraftProduct = async (req, res) => {
