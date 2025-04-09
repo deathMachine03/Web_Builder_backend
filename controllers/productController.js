@@ -14,24 +14,34 @@ exports.getDraftProducts = async (req, res) => {
 // 📌 Добавить товар (DRAFT)
 exports.addDraftProduct = async (req, res) => {
     try {
-        const { name, price, description, imageUrl } = req.body;
-        const newProduct = await DraftProduct.create({ name, price, description, imageUrl });
+        const { name, price, description, imageUrl, quantity } = req.body;
+
+        const newProduct = await DraftProduct.create({
+            name,
+            price,
+            description,
+            imageUrl,
+            quantity: quantity ?? 1
+        });
+
         res.status(201).json(newProduct);
     } catch (error) {
         res.status(500).json({ message: "Ошибка добавления товара", error });
     }
 };
 
+
 // 📌 Обновить товар (DRAFT)
 exports.updateDraftProduct = async (req, res) => {
     try {
         const { id } = req.params;
+        console.log("🔧 Обновление товара:", id, req.body);
         const updatedProduct = await DraftProduct.findByIdAndUpdate(
-            id, 
-            req.body, 
-            { new: true, runValidators: true } // ✅ Добавляем `runValidators`
+            id,
+            req.body,
+            { new: true, runValidators: true }
         );
-        
+
         if (!updatedProduct) {
             return res.status(404).json({ message: "Товар не найден" });
         }
@@ -45,6 +55,7 @@ exports.updateDraftProduct = async (req, res) => {
 
 
 
+
 // 📌 Удалить товар (DRAFT)
 exports.deleteDraftProduct = async (req, res) => {
     try {
@@ -55,6 +66,23 @@ exports.deleteDraftProduct = async (req, res) => {
         res.status(500).json({ message: "Ошибка удаления товара", error });
     }
 };
+
+
+// 📌 Получение одного товара (DRAFT)
+exports.getDraftProductById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const product = await DraftProduct.findById(id);
+        if (!product) {
+            return res.status(404).json({ message: "Товар не найден" });
+        }
+        res.json(product);
+    } catch (error) {
+        console.error("Ошибка получения товара:", error);
+        res.status(500).json({ message: "Ошибка получения товара", error });
+    }
+};
+
 
 // 🚀 Публикация товаров (перенос из DRAFT в LIVE)
 exports.publishProducts = async (req, res) => {

@@ -6,7 +6,8 @@ const {
     updateDraftProduct,
     deleteDraftProduct,
     publishProducts,
-    getLiveProducts
+    getLiveProducts,
+    getDraftProductById
 } = require("../controllers/productController");
 
 // 🔄 Черновик (DRAFT)
@@ -14,6 +15,7 @@ router.get("/draft", getDraftProducts);
 router.post("/draft", addDraftProduct);
 router.patch("/draft/:id", updateDraftProduct);
 router.delete("/draft/:id", deleteDraftProduct);
+router.get("/draft/:id", getDraftProductById);
 
 // 🚀 Публикация товаров
 router.post("/publish", publishProducts);

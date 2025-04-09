@@ -5,6 +5,7 @@ const DraftProductSchema = new mongoose.Schema({
     price: { type: Number, required: true },
     description: { type: String, default: "" },
     imageUrl: { type: String, default: "" },
+    quantity: { type: Number, default: 1 },
 });
 
 module.exports = mongoose.model("DraftProduct", DraftProductSchema);
