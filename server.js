@@ -10,6 +10,11 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+
+const authRoutes = require("./routes/authRoutes");
+app.use("/api", authRoutes);
+
+
 // ✅ Гарантируем, что файлы сохраняются в `backend/uploads/`
 const uploadDir = path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadDir)) {
