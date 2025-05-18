@@ -4,17 +4,18 @@ const {
     getDraftSettings, 
     updateDraftSettings, 
     publishSettings, 
-    getLiveSettings 
+    getLiveSettingsByUserId,
+    getLiveSettings,
 } = require("../controllers/settingsController");
+const authMiddleware = require("../middleware/authMiddleware");
 
-// 🔄 Работа с черновиком (для конструктора)
-router.get("/draft", getDraftSettings);   // Получить черновик
-router.patch("/draft", updateDraftSettings); // Обновить черновик
 
-// 🚀 Публикация (копирование из `draft` в `live`)
-router.post("/publish", publishSettings);
 
-// 🌍 Работа с опубликованными настройками (для storefront)
-router.get("/live", getLiveSettings); // Получить опубликованный сайт
+router.get("/draft", authMiddleware, getDraftSettings);
+router.patch("/draft", authMiddleware, updateDraftSettings);
+router.post("/publish", authMiddleware, publishSettings);
+router.get("/settings/live/:userId", getLiveSettingsByUserId);
+// router.get("/live", getLiveSettings);
+
 
 module.exports = router;

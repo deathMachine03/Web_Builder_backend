@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const SettingsSchema = new mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     logo: { type: String, default: "" },
     bgImage: { type: String, default: "" },
     text: { type: String, default: "Добро пожаловать!" },

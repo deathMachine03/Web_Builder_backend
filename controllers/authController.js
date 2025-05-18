@@ -4,7 +4,6 @@ const jwt = require("jsonwebtoken");
 
 const JWT_SECRET = process.env.JWT_SECRET || "secret123";
 
-// Регистрация
 exports.register = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -22,7 +21,7 @@ exports.register = async (req, res) => {
   }
 };
 
-// Вход
+
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -40,7 +39,6 @@ exports.login = async (req, res) => {
   }
 };
 
-// Получение профиля по токену
 exports.getProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-passwordHash");

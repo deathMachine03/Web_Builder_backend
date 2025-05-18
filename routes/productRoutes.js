@@ -1,4 +1,5 @@
 const express = require("express");
+const auth = require("../middleware/authMiddleware");
 const router = express.Router();
 const {
     getDraftProducts,
@@ -7,20 +8,20 @@ const {
     deleteDraftProduct,
     publishProducts,
     getLiveProducts,
-    getDraftProductById
+    getDraftProductById,
+    getLiveProductsByUserId,
+    getLiveProductById,
 } = require("../controllers/productController");
 
-// 🔄 Черновик (DRAFT)
-router.get("/draft", getDraftProducts);
-router.post("/draft", addDraftProduct);
-router.patch("/draft/:id", updateDraftProduct);
-router.delete("/draft/:id", deleteDraftProduct);
-router.get("/draft/:id", getDraftProductById);
+router.get("/draft", auth, getDraftProducts);
+router.post("/draft", auth, addDraftProduct);
+router.patch("/draft/:id", auth, updateDraftProduct);
+router.delete("/draft/:id", auth, deleteDraftProduct);
+router.post("/publish", auth, publishProducts);
+router.get("/draft/:id", auth, getDraftProductById);
+router.get("/live/:userId", getLiveProductsByUserId);
+router.get("/live/:userId/:id", getLiveProductById);
 
-// 🚀 Публикация товаров
-router.post("/publish", publishProducts);
-
-// 🌍 Опубликованные товары (LIVE)
-router.get("/live", getLiveProducts);
+// router.get("/live", auth, getLiveProducts);
 
 module.exports = router;
